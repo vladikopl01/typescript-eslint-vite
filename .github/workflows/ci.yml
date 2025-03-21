@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  get-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      node_version: ${{ steps.node-version.outputs.node_version }}
+      pnpm_version: ${{ steps.node-version.outputs.pnpm_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Node.JS version from package.json
+        id: node-version
+        run: |
+          echo "node_version=$(jq -r .engines.node ./package.json)" >> $GITHUB_OUTPUT
+          echo "pnpm_version=$(jq -r .engines.pnpm ./package.json)" >> $GITHUB_OUTPUT
+
+  quality-checks:
+    runs-on: ubuntu-latest
+    needs: [get-versions]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ needs.get-versions.outputs.pnpm_version }}
+
+      - name: Use Node.js ${{ needs.get-versions.outputs.node_version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.get-versions.outputs.node_version }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run Prettier check
+        run: pnpm run prettier:check
+
+      - name: Run ESLint check
+        run: pnpm run eslint:check
+
+      - name: Run typecheck
+        run: pnpm run typecheck
+
+      - name: Run build
+        run: pnpm run build
+
+      - name: Run tests
+        run: pnpm run test:ci

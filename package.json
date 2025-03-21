@@ -1,28 +1,36 @@
 {
-  "name": "vscode-theme-generator",
-  "type": "module",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "typescript-eslint-vite",
+  "version": "0.0.1",
+  "private": true,
+  "keywords": [],
+  "license": "ISC",
   "scripts": {
+    "build": "pnpm clean && tsc -p tsconfig.build.json",
+    "clean": "rm -rf dist",
     "dev": "tsx --watch src/index.ts",
     "start": "node dist/index.js",
-    "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "eslint:check": "pnpm eslint --max-warnings 0 './**/*.ts'",
+    "prettier:base": "prettier ./** --ignore-path=../../.prettierignore",
+    "prettier:check": "pnpm prettier:base --check",
+    "prettier:write": "pnpm prettier:base --write",
+    "test:ci": "CI=1 pnpm test",
+    "test": "vitest --no-file-parallelism"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@types/node": "^22.13.11",
+    "@vitest/coverage-v8": "^3.0.9",
+    "@vitest/eslint-plugin": "^1.1.38",
     "eslint": "^9.22.0",
     "prettier": "^3.5.3",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.27.0"
+    "typescript-eslint": "^8.27.0",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.0.9"
+  },
+  "engines": {
+    "node": "22.14.0",
+    "pnpm": ">=10"
   }
 }
